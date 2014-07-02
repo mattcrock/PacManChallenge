@@ -1,2 +1,0 @@
-EnterlectChallenge/bin/
-EnterlectChallenge/obj/

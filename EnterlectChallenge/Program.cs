@@ -18,7 +18,7 @@ namespace PacManDuelBot
         private const char _WALL = '#';
         private const char _PLAYER_SYMBOL = 'A';
         private const String _OUTPUT_FILE_NAME = "game.state";
-        private const String _INITIAL_FILE_NAME = "initial.state";
+        private const String _INITIAL_FILE_NAME = @"..\..\initial.state";
 
         static void Main(string[] args)
         {
