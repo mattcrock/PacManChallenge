@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using EnterlectChallenge;
+using System.Threading;
 
 namespace PacManDuelBot
 {
@@ -17,10 +18,11 @@ namespace PacManDuelBot
         private const char _WALL = '#';
         private const char _PLAYER_SYMBOL = 'A';
         private const String _OUTPUT_FILE_NAME = "game.state";
+        private const String _INITIAL_FILE_NAME = "initial.state";
 
         static void Main(string[] args)
         {
-            var maze = ReadMaze(args[0]);
+            var maze = ReadMaze(_INITIAL_FILE_NAME);
             var coordinate = GetCurrentPosition(maze);
             if (!coordinate.IsEmpty)
             {
@@ -29,6 +31,20 @@ namespace PacManDuelBot
                 var randomMoveIndex = random.Next(0, possibleMoveList.Count);
                 maze = MakeMove(coordinate, possibleMoveList[randomMoveIndex], maze);
                 WriteMaze(maze, _OUTPUT_FILE_NAME);
+            }
+            while (true)
+            {
+                maze = ReadMaze(_OUTPUT_FILE_NAME);
+                coordinate = GetCurrentPosition(maze);
+                if (!coordinate.IsEmpty)
+                {
+                    var possibleMoveList = DetermineMoves(coordinate, maze);
+                    var random = new Random();
+                    var randomMoveIndex = random.Next(0, possibleMoveList.Count);
+                    maze = MakeMove(coordinate, possibleMoveList[randomMoveIndex], maze);
+                    WriteMaze(maze, _OUTPUT_FILE_NAME);
+                    Thread.Sleep(1000);
+                }
             }
         }
 
@@ -94,19 +110,30 @@ namespace PacManDuelBot
                     for (var y = 0; y < _WIDTH; y++)
                     {
                         output += maze[x][y];
-                        Console.Write("hello");
                     }
                     if (x != _HEIGHT - 1) output += ('\n');
                 }
                 file.Write(output);
                 file.Close();
+                PrintToScreen(output);
             }
         }
 
-        private static Tree ReadMazeTree(String filePath)
+        private static void PrintToScreen(string outputGameContents)
+        {
+            var output = outputGameContents.Replace("#", " #");
+            output = output.Replace("A", " A");
+            output = output.Replace("B", " B");
+            output = output.Replace(".", " .");
+            output = output.Replace("*", " *");
+            output += "\r\n\r\n";
+            Console.Write(output);
+        }
+
+        private static TreeNode ReadMazeTree(String filePath)
         {
             var fileContents = System.IO.File.ReadAllText(filePath);
-            var boardTree = new Tree(fileContents);
+            var boardTree = new TreeNode(fileContents);
             return boardTree;
         }
 

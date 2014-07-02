@@ -1,6 +1,0 @@
-C:\Personal Dev\Enterlect Challenge\EnterlectChallenge\bin\Debug\EnterlectChallenge.exe.config
-C:\Personal Dev\Enterlect Challenge\EnterlectChallenge\bin\Debug\EnterlectChallenge.exe
-C:\Personal Dev\Enterlect Challenge\EnterlectChallenge\bin\Debug\EnterlectChallenge.pdb
-C:\Personal Dev\Enterlect Challenge\EnterlectChallenge\obj\Debug\EnterlectChallenge.csprojResolveAssemblyReference.cache
-C:\Personal Dev\Enterlect Challenge\EnterlectChallenge\obj\Debug\EnterlectChallenge.exe
-C:\Personal Dev\Enterlect Challenge\EnterlectChallenge\obj\Debug\EnterlectChallenge.pdb
