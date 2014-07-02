@@ -1,2 +1,2 @@
-EnterlectChallenge\bin\
-EnterlectChallenge\obj\
+EnterlectChallenge/bin/
+EnterlectChallenge/obj/
