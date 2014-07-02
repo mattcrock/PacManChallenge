@@ -9,20 +9,24 @@ namespace PacManDuelBot
 {
     class Program
     {
-        private const int _WIDTH = 19;
-        private const int _HEIGHT = 22;
-        private const int _PORTAL1_X = 10;
-        private const int _PORTAL1_Y = 0;
-        private const int _PORTAL2_X = 10;
-        private const int _PORTAL2_Y = 18;
-        private const char _WALL = '#';
-        private const char _PLAYER_SYMBOL = 'A';
-        private const String _OUTPUT_FILE_NAME = "game.state";
-        private const String _INITIAL_FILE_NAME = @"..\..\initial.state";
+        private const int WIDTH = 19;
+        private const int HEIGHT = 22;
+        private const int PORTAL1_X = 10;
+        private const int PORTAL1_Y = 0;
+        private const int PORTAL2_X = 10;
+        private const int PORTAL2_Y = 18;
+        private const char WALL = '#';
+        private const char ONE_POINTER = '.';
+        private const char TEN_POINTER = '*';
+        private const char POISON_PILL = '!';
+        private const char PLAYER_A = 'A';
+        private const char PLAYER_B = 'B';
+        private const String OUTPUT_FILE_NAME = "game.state";
+        private const String INITIAL_FILE_NAME = @"..\..\initial.state";
 
         static void Main(string[] args)
         {
-            var maze = ReadMaze(_INITIAL_FILE_NAME);
+            var maze = ReadMaze(INITIAL_FILE_NAME);
             var coordinate = GetCurrentPosition(maze);
             if (!coordinate.IsEmpty)
             {
@@ -30,11 +34,11 @@ namespace PacManDuelBot
                 var random = new Random();
                 var randomMoveIndex = random.Next(0, possibleMoveList.Count);
                 maze = MakeMove(coordinate, possibleMoveList[randomMoveIndex], maze);
-                WriteMaze(maze, _OUTPUT_FILE_NAME);
+                WriteMaze(maze, OUTPUT_FILE_NAME);
             }
             while (true)
             {
-                maze = ReadMaze(_OUTPUT_FILE_NAME);
+                maze = ReadMaze(OUTPUT_FILE_NAME);
                 coordinate = GetCurrentPosition(maze);
                 if (!coordinate.IsEmpty)
                 {
@@ -42,7 +46,7 @@ namespace PacManDuelBot
                     var random = new Random();
                     var randomMoveIndex = random.Next(0, possibleMoveList.Count);
                     maze = MakeMove(coordinate, possibleMoveList[randomMoveIndex], maze);
-                    WriteMaze(maze, _OUTPUT_FILE_NAME);
+                    WriteMaze(maze, OUTPUT_FILE_NAME);
                     Thread.Sleep(1000);
                 }
             }
@@ -51,11 +55,11 @@ namespace PacManDuelBot
         private static Point GetCurrentPosition(char[][] maze)
         {
             var coordinate = new Point();
-            for (var x = 0; x < _HEIGHT; x++)
+            for (var x = 0; x < HEIGHT; x++)
             {
-                for (var y = 0; y < _WIDTH; y++)
+                for (var y = 0; y < WIDTH; y++)
                 {
-                    if (maze[x][y].Equals(_PLAYER_SYMBOL))
+                    if (maze[x][y].Equals(PLAYER_A))
                     {
                         coordinate.X = x;
                         coordinate.Y = y;
@@ -68,27 +72,27 @@ namespace PacManDuelBot
         private static List<Point> DetermineMoves(Point currentPoint, char[][] maze)
         {
             var moveList = new List<Point>();
-            if (currentPoint.Y + 1 < _WIDTH)
-                if (!maze[currentPoint.X][currentPoint.Y + 1].Equals(_WALL))
+            if (currentPoint.Y + 1 < WIDTH)
+                if (!maze[currentPoint.X][currentPoint.Y + 1].Equals(WALL))
                     moveList.Add(new Point { X = currentPoint.X, Y = currentPoint.Y + 1 });
 
             if (currentPoint.Y - 1 >= 0)
-                if (!maze[currentPoint.X][currentPoint.Y - 1].Equals(_WALL))
+                if (!maze[currentPoint.X][currentPoint.Y - 1].Equals(WALL))
                     moveList.Add(new Point { X = currentPoint.X, Y = currentPoint.Y - 1 });
 
-            if (currentPoint.X + 1 < _HEIGHT)
-                if (!maze[currentPoint.X + 1][currentPoint.Y].Equals(_WALL))
+            if (currentPoint.X + 1 < HEIGHT)
+                if (!maze[currentPoint.X + 1][currentPoint.Y].Equals(WALL))
                     moveList.Add(new Point { X = currentPoint.X + 1, Y = currentPoint.Y });
 
             if (currentPoint.X - 1 >= 0)
-                if (!maze[currentPoint.X - 1][currentPoint.Y].Equals(_WALL))
+                if (!maze[currentPoint.X - 1][currentPoint.Y].Equals(WALL))
                     moveList.Add(new Point { X = currentPoint.X - 1, Y = currentPoint.Y });
 
-            if (currentPoint.X.Equals(_PORTAL1_X) && currentPoint.Y.Equals(_PORTAL1_Y))
-                moveList.Add(new Point { X = _PORTAL2_X, Y = _PORTAL2_Y });
+            if (currentPoint.X.Equals(PORTAL1_X) && currentPoint.Y.Equals(PORTAL1_Y))
+                moveList.Add(new Point { X = PORTAL2_X, Y = PORTAL2_Y });
 
-            if (currentPoint.X.Equals(_PORTAL2_X) && currentPoint.Y.Equals(_PORTAL2_Y))
-                moveList.Add(new Point { X = _PORTAL1_X, Y = _PORTAL1_Y });
+            if (currentPoint.X.Equals(PORTAL2_X) && currentPoint.Y.Equals(PORTAL2_Y))
+                moveList.Add(new Point { X = PORTAL1_X, Y = PORTAL1_Y });
 
             return moveList;
         }
@@ -96,7 +100,7 @@ namespace PacManDuelBot
         private static char[][] MakeMove(Point currentPoint, Point movePoint, char[][] maze)
         {
             maze[currentPoint.X][currentPoint.Y] = ' ';
-            maze[movePoint.X][movePoint.Y] = _PLAYER_SYMBOL;
+            maze[movePoint.X][movePoint.Y] = PLAYER_A;
             return maze;
         }
 
@@ -105,13 +109,13 @@ namespace PacManDuelBot
             using (var file = new System.IO.StreamWriter(filePath))
             {
                 var output = "";
-                for (var x = 0; x < _HEIGHT; x++)
+                for (var x = 0; x < HEIGHT; x++)
                 {
-                    for (var y = 0; y < _WIDTH; y++)
+                    for (var y = 0; y < WIDTH; y++)
                     {
                         output += maze[x][y];
                     }
-                    if (x != _HEIGHT - 1) output += ('\n');
+                    if (x != HEIGHT - 1) output += ('\n');
                 }
                 file.Write(output);
                 file.Close();
@@ -139,7 +143,7 @@ namespace PacManDuelBot
 
         private static char[][] ReadMaze(String filePath)
         {
-            var map = new char[_HEIGHT][];
+            var map = new char[HEIGHT][];
             try
             {
                 var fileContents = System.IO.File.ReadAllText(filePath);
