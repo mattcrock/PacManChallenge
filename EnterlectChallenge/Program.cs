@@ -29,6 +29,16 @@ namespace PacManDuelBot
 
         static void Main(string[] args)
         {
+            //so far this will, read the file into a 2d char array, figure out possible moves, pick one of these at random, make the move, output the result, and wirte the file back.
+
+            //what need to be fixed is:
+            //      more intelligent move determination, deeper scanning
+            //          this might involve not using a 2d char array.
+            //          a tree or a graph might be the answer to picking better moves
+            //      a better GUI / output of the file, so that it is easier to see what is going on.
+            //
+            //      need to make consideration of the other player, if it is worth while to eat them when in range.
+            //      need to think about the poinson pill, would it be worth while to drop and eat your own at some point to get back to the cetre of the board quickly
             var board = ReadMaze(INITIAL_FILE_NAME);
             var coordinate = GetCurrentPosition(board);
             if (!coordinate.IsEmpty)
