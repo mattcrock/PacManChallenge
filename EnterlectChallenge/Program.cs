@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using EnterlectChallenge;
 using System.Threading;
+using System.Linq;
 
 namespace PacManDuelBot
 {
@@ -33,7 +34,7 @@ namespace PacManDuelBot
             if (!coordinate.IsEmpty)
             {
                 var possibleMoveList = DetermineMoves(coordinate, board);
-                var bestMove = DetermineBestMove(possibleMoveList, coordinate, board);
+                var bestMove = DetermineBestMove(possibleMoveList, coordinate, board, 15);
                 board = MakeMove(coordinate, bestMove, board);
                 WriteMaze(board, OUTPUT_FILE_NAME);
             }
@@ -44,7 +45,7 @@ namespace PacManDuelBot
                 if (!coordinate.IsEmpty)
                 {
                     var possibleMoveList = DetermineMoves(coordinate, board);
-                    var bestMove = DetermineBestMove(possibleMoveList, coordinate, board);
+                    var bestMove = DetermineBestMove(possibleMoveList, coordinate, board, 15);
                     board = MakeMove(coordinate, bestMove, board);
                     WriteMaze(board, OUTPUT_FILE_NAME);
                     Thread.Sleep(100);
@@ -69,24 +70,43 @@ namespace PacManDuelBot
             return coordinate;
         }
 
-        public static Point DetermineBestMove(List<Point> possibleMoves ,Point currentPosition, char[][] board)
+        public static Point DetermineBestMove(List<Point> possibleMoves ,Point currentPosition, char[][] board, int depthToSearch)
         {
-            var random = new Random();
-            var randomMoveIndex = random.Next(0, possibleMoves.Count);
-            var bestMoveSoFar = possibleMoves[0];
+            //we need to recursively find the best move, based one the next possible set of moves, and so on
+
+            //for this we could use the value property on the point object, so trace throught the possible moves after the next ones, to find the best option right now.
+            var movesWithValues = new List<Point>();
+            var bestMove = possibleMoves[0];
             foreach (var move in possibleMoves)
             {
-                if (board[move.X][move.Y] != board[bestMoveSoFar.X][bestMoveSoFar.Y])
+                if (depthToSearch > 0)
                 {
-                    if (board[move.X][move.Y] == TEN_POINTER)
-                        bestMoveSoFar = move;
-                    else if (board[move.X][move.Y] == ONE_POINTER)
-                        bestMoveSoFar = move;
-                    //else if (board[move.X][move.Y] == EMPTY)
-                    //    bestMoveSoFar = move;
+                    move.valueOfMove = board[move.X][move.Y] != EMPTY ? (board[move.X][move.Y] == TEN_POINTER ? 10 : (board[move.X][move.Y] == ONE_POINTER ? 1 : 0)) : 0;
+                    movesWithValues.Add(move);
+                    DetermineBestMove(DetermineMoves(move, board), move, board, depthToSearch - 1);
+                }
+
+                //if (board[move.X][move.Y] != board[bestMoveSoFar.X][bestMoveSoFar.Y])
+                //{
+                //    if (board[move.X][move.Y] == TEN_POINTER)
+                //    {
+                //        bestMoveSoFar = depthToSearch > 0 ? DetermineBestMove(DetermineMoves(move,board), move, board, depthToSearch-1) : move;
+                //    }
+                //    else if (board[move.X][move.Y] == ONE_POINTER)
+                //    {
+                //        bestMoveSoFar = depthToSearch > 0 ? DetermineBestMove(DetermineMoves(move, board), move, board, depthToSearch - 1) : move;
+                //    }
+                //    else if (board[move.X][move.Y] == EMPTY)
+                //        bestMoveSoFar = depthToSearch > 0 ? DetermineBestMove(DetermineMoves(move, board), move, board, depthToSearch - 1) : move;
+                //}
+                depthToSearch--;
+
+                foreach (var valMove in movesWithValues)
+                {
+                    bestMove = valMove.valueOfMove >= bestMove.valueOfMove ? valMove : bestMove;
                 }
             }
-            return bestMoveSoFar;
+            return bestMove;
         }
 
         private static List<Point> DetermineMoves(Point currentPosition, char[][] board)
@@ -155,6 +175,13 @@ namespace PacManDuelBot
         private static void PrintToScreen(string outputGameContents)
         {
             //in here need to do a nice gui
+            outputGameContents = outputGameContents.Replace("#", "###");
+            outputGameContents = outputGameContents.Replace(" ", "   ");
+            outputGameContents = outputGameContents.Replace("A", " A ");
+            outputGameContents = outputGameContents.Replace("B", " B ");
+            outputGameContents = outputGameContents.Replace(".", " . ");
+            outputGameContents = outputGameContents.Replace("*", " * ");
+            outputGameContents = outputGameContents.Replace("!", " ! ");
             outputGameContents += "\r\n\r\n";
             Console.Write(outputGameContents);
             Console.Write(String.Format("Current Tally: {0} \r\n", runningTally));
