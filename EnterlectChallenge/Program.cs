@@ -10,6 +10,8 @@ namespace PacManDuelBot
 {
     class Program
     {
+        private static TreeNode Root;
+        private static int DepthToSearch = 20;
         private const int WIDTH = 19;
         private const int HEIGHT = 22;
         private const int PORTAL1_X = 10;
@@ -41,9 +43,16 @@ namespace PacManDuelBot
             //      need to think about the poinson pill, would it be worth while to drop and eat your own at some point to get back to the cetre of the board quickly
             var board = ReadMaze(INITIAL_FILE_NAME);
             var coordinate = GetCurrentPosition(board);
+            //create the root of the tree, then call the method that will create the rest of the tree recusively
+            Root = new TreeNode(board[coordinate.X][coordinate.Y], new Point(coordinate.X, coordinate.Y));
+
+
             if (!coordinate.IsEmpty)
             {
                 var possibleMoveList = DetermineMoves(coordinate, board);
+
+                CreateTree(board, coordinate, possibleMoveList, DepthToSearch);
+
                 var bestMove = DetermineBestMove(possibleMoveList, coordinate, board, 15);
                 board = MakeMove(coordinate, bestMove, board);
                 WriteMaze(board, OUTPUT_FILE_NAME);
@@ -124,25 +133,25 @@ namespace PacManDuelBot
             var moveList = new List<Point>();
             if (currentPosition.Y + 1 < WIDTH)
                 if (!board[currentPosition.X][currentPosition.Y + 1].Equals(WALL))
-                    moveList.Add(new Point { X = currentPosition.X, Y = currentPosition.Y + 1 });
+                    moveList.Add(new Point(currentPosition.X, currentPosition.Y + 1 ));
 
             if (currentPosition.Y - 1 >= 0)
                 if (!board[currentPosition.X][currentPosition.Y - 1].Equals(WALL))
-                    moveList.Add(new Point { X = currentPosition.X, Y = currentPosition.Y - 1 });
+                    moveList.Add(new Point(currentPosition.X, currentPosition.Y - 1));
 
             if (currentPosition.X + 1 < HEIGHT)
                 if (!board[currentPosition.X + 1][currentPosition.Y].Equals(WALL))
-                    moveList.Add(new Point { X = currentPosition.X + 1, Y = currentPosition.Y });
+                    moveList.Add(new Point(currentPosition.X + 1, currentPosition.Y));
 
             if (currentPosition.X - 1 >= 0)
                 if (!board[currentPosition.X - 1][currentPosition.Y].Equals(WALL))
-                    moveList.Add(new Point { X = currentPosition.X - 1, Y = currentPosition.Y });
+                    moveList.Add(new Point(currentPosition.X - 1, currentPosition.Y));
 
             if (currentPosition.X.Equals(PORTAL1_X) && currentPosition.Y.Equals(PORTAL1_Y))
-                moveList.Add(new Point { X = PORTAL2_X, Y = PORTAL2_Y });
+                moveList.Add(new Point(PORTAL2_X, PORTAL2_Y));
 
             if (currentPosition.X.Equals(PORTAL2_X) && currentPosition.Y.Equals(PORTAL2_Y))
-                moveList.Add(new Point { X = PORTAL1_X, Y = PORTAL1_Y });
+                moveList.Add(new Point(PORTAL1_X, PORTAL1_Y));
 
             return moveList;
         }
@@ -198,13 +207,6 @@ namespace PacManDuelBot
 
         }
 
-        private static TreeNode ReadMazeTree(String filePath)
-        {
-            var fileContents = System.IO.File.ReadAllText(filePath);
-            var boardTree = new TreeNode(fileContents);
-            return boardTree;
-        }
-
         private static char[][] ReadMaze(String filePath)
         {
             var map = new char[HEIGHT][];
@@ -223,6 +225,21 @@ namespace PacManDuelBot
                 Console.Write(e.ToString());
             }
             return map;
+        }
+
+        public static void CreateTree(char[][] board, Point currentPoint, List<Point> possibleMoves, int depth)
+        {
+            if (depth != 0)
+            {
+                depth--;
+                var localBoard = board;
+                foreach (var move in possibleMoves)
+                {
+                    MakeMove(currentPoint, move, localBoard);
+                    Root.Add(new TreeNode(board[move.X][move.Y], move));
+                    CreateTree(localBoard, move, DetermineMoves(move, localBoard), depth-1);
+                }
+            }
         }
 
     }

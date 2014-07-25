@@ -7,51 +7,40 @@ using System.Threading.Tasks;
 
 namespace EnterlectChallenge
 {
-    class TreeNode : IEnumerable<TreeNode>
+    class TreeNode 
     {
-        private readonly Dictionary<string, TreeNode> _childs = new Dictionary<string, TreeNode>();
+        private List<TreeNode> children = new List<TreeNode>();
 
-        public readonly string Value;
+        public readonly char Value;
+        public readonly Point coOrd;
         public TreeNode Parent { get; private set; }
-        public TreeNode MoveUp { get; private set; }
-        public TreeNode MoveDown { get; private set; }
-        public TreeNode MoveLeft { get; private set; }
-        public TreeNode MoveRight { get; private set; }
+        
 
-        public TreeNode(string value)
+        public TreeNode(char value, Point coOrd)
         {
             this.Value = value;
+            this.coOrd = coOrd;
         }
 
-        public TreeNode GetChild(string id)
+        public TreeNode GetChild(int id)
         {
-            return this._childs[id];
+            return this.children[id];
         }
 
         public void Add(TreeNode item)
         {
             if (item.Parent != null)
             {
-                item.Parent._childs.Remove(item.Value);
+                item.Parent.children.Remove(item);
             }
 
             item.Parent = this;
-            this._childs.Add(item.Value, item);
-        }
-
-        public IEnumerator<TreeNode> GetEnumerator()
-        {
-            return this._childs.Values.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
+            this.children.Add(item);
         }
 
         public int Count
         {
-            get { return this._childs.Count; }
+            get { return this.children.Count; }
         }
     }
 }

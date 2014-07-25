@@ -12,9 +12,12 @@ namespace EnterlectChallenge
         public bool IsEmpty { get; set; }
         public int valueOfMove { get; set; }
 
-        public Point()
-        {
+        public Point() { }
 
+        public Point(int x, int y)
+        {
+            this.X = x;
+            this.Y = y;
         }
     }
 }
